@@ -17,6 +17,7 @@ socket.emit('joinRoom', { username, room });
 socket.on('roomUsers', ({ room, users }) => {
   outputRoomName(room);
   outputUsers(users);
+  document.getElementById("msg").placeholder="Message " + room;
 });
 
 // Message from server
@@ -56,7 +57,7 @@ function outputMessage(message) {
   const p = document.createElement('p');
   p.classList.add('meta');
   p.innerText = message.username;
-  p.innerHTML += `<span>${message.time}</span>`;
+  p.innerHTML += `<span><h5 style="display: inline;">&nbsp ${message.time}</h5></span>`;
   div.appendChild(p);
   const para = document.createElement('p');
   para.classList.add('text');
