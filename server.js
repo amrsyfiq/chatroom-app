@@ -3,10 +3,11 @@ const http = require("http");
 const express = require("express");
 const socketio = require("socket.io");
 const formatMessage = require("./utils/messages");
-const createAdapter = require("@socket.io/redis-adapter").createAdapter;
-const redis = require("redis");
 require("dotenv").config();
-const { createClient } = redis;
+
+const { createClient } = require("redis");
+const { createAdapter } = require("@socket.io/redis-adapter");
+
 const {
   userJoin,
   getCurrentUser,
@@ -17,6 +18,25 @@ const {
 const app = express();
 const server = http.createServer(app);
 const io = socketio(server);
+
+(async () => {
+  const pubClient = createClient({
+      legacyMode: true,
+      url: "redis://127.0.0.1:6379"
+  });
+  const subClient = pubClient.duplicate();
+
+  io.adapter(createAdapter(pubClient, subClient));
+
+  pubClient.on("error", (err) => {
+    console.log(err.message);
+  });
+  
+  subClient.on("error", (err) => {
+    console.log(err.message);
+  });
+  
+})();
 
 // Set static folder
 app.use(express.static(path.join(__dirname, "public")));
